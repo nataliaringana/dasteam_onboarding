@@ -107,5 +107,5 @@ dispatcher.add_handler(CommandHandler('start', start))
 dispatcher.add_handler(CallbackQueryHandler(handle_callback))
 
 if __name__ == '__main__':
-    app.run(port=8443)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
