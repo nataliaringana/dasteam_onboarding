@@ -1,2 +1,6 @@
 Flask
 python-telegram-bot
+pyTelegramBotAPI
+moviepy
+numpy
+ffmpeg-python
