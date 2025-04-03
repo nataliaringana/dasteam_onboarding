@@ -7,6 +7,12 @@ bot = telebot.TeleBot(API_TOKEN)
 
 app = Flask(__name__)
 
+# Handler für das /start-Kommando
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.send_message(message.chat.id, "Hallo und willkommen! Wie kann ich dir helfen?")
+
+# Webhook-Endpunkt
 @app.route("/", methods=["POST"])
 def webhook():
     json_str = request.get_data().decode("UTF-8")
@@ -14,7 +20,8 @@ def webhook():
     bot.process_new_updates([update])
     return "OK", 200
 
-if __name__ == "__main__":
-    bot.remove_webhook()
-    bot.set_webhook(url="https://api.render.com/deploy/srv-cvn8id1r0fns738jm7l0?key=8roahJ-SX3w")
-    app.run(host="0.0.0.0", port=5000)
+# Webhook-Setup (wird beim Start ausgeführt)
+bot.remove_webhook()
+bot.set_webhook(url="https://DEIN-RENDER-URL/")  # Ersetze DEIN-RENDER-URL mit deiner tatsächlichen URL
+
+# Hinweis: Den Flask-Server starten wir über gunicorn (nicht über app.run)
