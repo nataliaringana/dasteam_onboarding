@@ -4,11 +4,10 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import ParseMode
 from aiogram import Router
 
 API_TOKEN = os.getenv("API_TOKEN")
-bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # Ссылка на видео с Google Drive
