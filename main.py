@@ -9,8 +9,12 @@ from aiogram import Router
 API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
 bot = Bot(token=API_TOKEN)
 
+# Новый способ создания Dispatcher в aiogram 3.x
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
+
+# Создаем Router для регистрации обработчиков
+router = Router()
 
 # Ссылка на видео с Google Drive
 video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на свой ID видео
@@ -57,17 +61,20 @@ async def send_step(chat_id):
     # Отправляем кнопку
     await bot.send_message(chat_id, "Нажми кнопку, чтобы продолжить.", reply_markup=keyboard)
 
-# Обрабатываем команду /start
-@dp.message_handler(commands=['start'])
+# Регистрация обработчиков с использованием Router
+@router.message(commands=['start'])
 async def send_welcome(message: types.Message):
     # Начинаем с первого шага
     await send_step(message.chat.id)
 
 # Обработка кнопки "Дальше"
-@dp.callback_query_handler(lambda c: c.data == "next_1")
+@router.callback_query(lambda c: c.data == "next_1")
 async def next_step(callback_query: types.CallbackQuery):
     # Переход к следующему шагу (на данный момент просто подтверждаем)
     await callback_query.message.edit_text("Переход к следующему шагу...")
+
+# Добавляем маршрутизатор в диспетчер
+dp.include_router(router)
 
 async def main():
     # Запускаем бота
