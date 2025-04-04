@@ -3,19 +3,19 @@ import requests
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils import executor
-from config import API_TOKEN
 
+API_TOKEN = os.getenv("API_TOKEN")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 # Ссылка на видео с Google Drive
-video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на ваш ID видео
+video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на свой ID видео
 video_url = f"https://drive.google.com/uc?id={video_id}"
 
 # Путь для сохранения видео локально
 video_path = "video.mp4"
 
-# Функция для скачивания видео
+# Функция для скачивания видео с Google Drive
 def download_video(url, path):
     response = requests.get(url, allow_redirects=True)
     with open(path, 'wb') as file:
