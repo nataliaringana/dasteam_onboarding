@@ -6,7 +6,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import Router
 
-API_TOKEN = os.getenv("API_TOKEN")
+API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
+bot = Bot(token=API_TOKEN)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
