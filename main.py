@@ -1,3 +1,4 @@
+#API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
 import os
 import requests
 import asyncio
@@ -5,8 +6,13 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import Router
+from aiogram.filters import Command
+from dotenv import load_dotenv
 
-API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
+# Загружаем переменные окружения из .env файла
+load_dotenv()
+
+API_TOKEN = os.getenv("API_TOKEN")  # Получаем токен из переменных окружения
 bot = Bot(token=API_TOKEN)
 
 # Новый способ создания Dispatcher в aiogram 3.x
@@ -62,7 +68,7 @@ async def send_step(chat_id):
     await bot.send_message(chat_id, "Нажми кнопку, чтобы продолжить.", reply_markup=keyboard)
 
 # Регистрация обработчиков с использованием Router
-@router.message(commands=['start'])
+@router.message(Command('start'))  # Используем Command фильтр
 async def send_welcome(message: types.Message):
     # Начинаем с первого шага
     await send_step(message.chat.id)
