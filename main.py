@@ -6,9 +6,13 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 from content import content
+from aiogram.client.default import DefaultBotProperties
 
 load_dotenv()
-bot = Bot(token=os.getenv("BOT_TOKEN"), parse_mode=ParseMode.HTML)
+bot = Bot(
+    token=os.getenv("BOT_TOKEN"),
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher()
 
 # Храним прогресс по пользователям
