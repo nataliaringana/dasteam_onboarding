@@ -1,25 +1,16 @@
 import os
 import asyncio
-
 from aiogram import Bot, Dispatcher, types, F
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-
-from aiohttp import web
 from dotenv import load_dotenv
-
 from content import content
 
 load_dotenv()
 
-TOKEN = os.getenv("BOT_TOKEN")
-WEBHOOK_PATH = f"/webhook/{TOKEN}"
-WEBHOOK_URL = os.getenv("WEBHOOK_URL") + WEBHOOK_PATH  # полный адрес: https://your-render-app.onrender.com/webhook/<token>
-
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(token=os.getenv("BOT_TOKEN"), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 user_progress = {}
@@ -55,24 +46,8 @@ async def send_next(chat_id, user_id):
     elif item["type"] == "video":
         await bot.send_video(chat_id, item["data"], reply_markup=keyboard)
 
-# Создаём веб-приложение для Render
-async def on_startup(app):
-    await bot.set_webhook(WEBHOOK_URL)
-
-async def on_shutdown(app):
-    await bot.delete_webhook()
-
 async def main():
-    app = web.Application()
-    dp.startup.register(on_startup)
-    dp.shutdown.register(on_shutdown)
-
-    # Вешаем хендлер
-    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
-
-    setup_application(app, dp)
-    port = int(os.environ.get("PORT", 8080))
-    return app
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    web.run_app(main(), port=int(os.environ.get("PORT", 8080)))
+    asyncio.run(main())
