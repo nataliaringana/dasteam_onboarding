@@ -15,7 +15,7 @@ bot = Bot(token=API_TOKEN)
 
 # Новый способ создания Dispatcher в aiogram 3.x
 storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+dp = Dispatcher(bot=bot, storage=storage)  # Передаем bot через ключевой аргумент
 
 # Создаем Router для регистрации обработчиков
 router = Router()
