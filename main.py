@@ -23,30 +23,10 @@ def get_next_content(user_id):
     user_progress[user_id] = index + 1
     return item
 
+
 @dp.message(CommandStart())
-async def start(message: types.Message):
-    user_progress[message.from_user.id] = 0
-    await send_next(message.chat.id, message.from_user.id)
-
-@dp.callback_query(F.data == "next")
-async def next_handler(callback: types.CallbackQuery):
-    await send_next(callback.message.chat.id, callback.from_user.id)
-    await callback.answer()
-
-async def send_next(chat_id, user_id):
-    item = get_next_content(user_id)
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Darf ich starten? 👇", callback_data="next")]]
-    )
-
-    if item is None:
-        await bot.send_message(chat_id, "📦 Konversation abgeschlossen!")
-    elif item["type"] == "text":
-        await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
-    elif item["type"] == "video":
-        await bot.send_video(chat_id, item["data"], reply_markup=keyboard)
-    elif item["type"] == "button":
-        await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
+def start(message):
+    bot.reply_to(message, "Привет! Я бот для управления чатом. Напиши /help, чтобы узнать, что я умею.")
 
 async def main():
     await dp.start_polling(bot)
