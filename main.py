@@ -1,55 +1,69 @@
 import os
-import asyncio
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.client.default import DefaultBotProperties
-from dotenv import load_dotenv
-from content import content
+import requests
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils import executor
+from config import API_TOKEN
 
-load_dotenv()
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher(bot)
 
-bot = Bot(token=os.getenv("BOT_TOKEN"), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+# Ссылка на видео с Google Drive
+video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на ваш ID видео
+video_url = f"https://drive.google.com/uc?id={video_id}"
 
-user_progress = {}
+# Путь для сохранения видео локально
+video_path = "video.mp4"
 
-def get_next_content(user_id):
-    index = user_progress.get(user_id, 0)
-    if index >= len(content):
-        return None
-    item = content[index]
-    user_progress[user_id] = index + 1
-    return item
+# Функция для скачивания видео
+def download_video(url, path):
+    response = requests.get(url, allow_redirects=True)
+    with open(path, 'wb') as file:
+        file.write(response.content)
+    print(f"Видео скачано по пути: {path}")
 
-@dp.message(CommandStart())
-async def start(message: types.Message):
-    user_progress[message.from_user.id] = 0
-    await send_next(message.chat.id, message.from_user.id)
+# Текст для первого шага
+step_1_text = """
+Hallo liebe/r {Vorname}! 😊
 
-@dp.callback_query(F.data == "next")
-async def next_handler(callback: types.CallbackQuery):
-    await send_next(callback.message.chat.id, callback.from_user.id)
-    await callback.answer()
+🎉 HERZLICH WILLKOMMEN IM TEAM! 🎉
+Ich freue mich, dich auf deinem Weg bei RINGANA zu begleiten. Gemeinsam schaffen wir Großes – mit Leichtigkeit und Freude.
+"""
 
-async def send_next(chat_id, user_id):
-    item = get_next_content(user_id)
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Darf ich starten? 👇", callback_data="next")]]
-    )
+# Функция для отправки видео и текста
+async def send_step(chat_id):
+    # Отправляем текст
+    await bot.send_message(chat_id, step_1_text.format(Vorname="User"))
 
-    if item is None:
-        await bot.send_message(chat_id, "📦 Konversation abgeschlossen!")
-    elif item["type"] == "text":
-        await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
-    elif item["type"] == "video":
-        await bot.send_video(chat_id, item["data"], reply_markup=keyboard)
-    elif item["type"] == "button":
-        await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
+    # Скачиваем видео
+    download_video(video_url, video_path)
 
-async def main():
-    await dp.start_polling(bot)
+    # Отправляем видео
+    with open(video_path, 'rb') as video:
+        await bot.send_video(chat_id, video, caption="Первое видео!")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    # Удаляем локальное видео после отправки
+    os.remove(video_path)
+
+    # Кнопка для перехода к следующему шагу
+    keyboard = InlineKeyboardMarkup()
+    button = InlineKeyboardButton("Дальше", callback_data="next_1")
+    keyboard.add(button)
+
+    # Отправляем кнопку
+    await bot.send_message(chat_id, "Нажми кнопку, чтобы продолжить.", reply_markup=keyboard)
+
+# Обрабатываем команду /start
+@dp.message_handler(commands=['start'])
+async def send_welcome(message: types.Message):
+    # Начинаем с первого шага
+    await send_step(message.chat.id)
+
+# Обработка кнопки "Дальше"
+@dp.callback_query_handler(lambda c: c.data == "next_1")
+async def next_step(callback_query: types.CallbackQuery):
+    # Переход к следующему шагу (на данный момент просто подтверждаем)
+    await callback_query.message.edit_text("Переход к следующему шагу...")
+
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=True)
