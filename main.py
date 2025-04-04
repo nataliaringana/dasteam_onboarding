@@ -8,7 +8,9 @@ from aiogram import Router
 
 API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot, storage=MemoryStorage())
+
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 
 # Ссылка на видео с Google Drive
 video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на свой ID видео
