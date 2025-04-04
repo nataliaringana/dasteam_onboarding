@@ -39,4 +39,27 @@ async def send_step(chat_id):
     keyboard.add(button)
 
     # Отправляем кнопку
-    await bot.send_message(chat_
+    await bot.send_message(chat_id, "Нажми кнопку, чтобы продолжить.", reply_markup=keyboard)
+
+# Регистрация обработчиков с использованием Router
+@router.message(Command('start'))  # Используем Command фильтр
+async def send_welcome(message: types.Message):
+    print(f"Команда /start получена от {message.from_user.first_name}")
+    await send_step(message.chat.id)
+
+# Обработка кнопки "Дальше"
+@router.callback_query(lambda c: c.data == "next_1")
+async def next_step(callback_query: types.CallbackQuery):
+    # Переход к следующему шагу (на данный момент просто подтверждаем)
+    await callback_query.message.edit_text("Переход к следующему шагу...")
+
+# Добавляем маршрутизатор в диспетчер
+dp.include_router(router)
+
+async def main():
+    # Запускаем бота
+    await dp.start_polling()
+
+# Используем asyncio.run для запуска асинхронной функции main
+if __name__ == '__main__':
+    asyncio.run(main())
