@@ -1,4 +1,3 @@
-#API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
 import os
 import requests
 import asyncio
@@ -87,4 +86,5 @@ async def main():
     await dp.start_polling()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
