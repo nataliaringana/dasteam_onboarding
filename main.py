@@ -1,12 +1,15 @@
 import os
 import requests
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils import executor
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import ParseMode
+from aiogram import Router
 
 API_TOKEN = os.getenv("API_TOKEN")
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher(bot, storage=MemoryStorage())
 
 # Ссылка на видео с Google Drive
 video_id = "1KlIj_WqsURqs7wKzuySAtfNZf1MzGSBe"  # Замените на свой ID видео
@@ -65,5 +68,9 @@ async def next_step(callback_query: types.CallbackQuery):
     # Переход к следующему шагу (на данный момент просто подтверждаем)
     await callback_query.message.edit_text("Переход к следующему шагу...")
 
+async def main():
+    # Запускаем бота
+    await dp.start_polling()
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())
