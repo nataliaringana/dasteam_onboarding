@@ -85,6 +85,6 @@ async def main():
     # Запускаем бота
     await dp.start_polling()
 
+# Используем asyncio.run для запуска асинхронной функции main
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    asyncio.run(main())
