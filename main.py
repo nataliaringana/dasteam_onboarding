@@ -8,7 +8,6 @@ from aiogram import Router
 
 API_TOKEN = os.getenv("API_TOKEN", "8115176392:AAHYnwCZOtSLQHVdtaVj7Cf4aiDYYPbPVs0")  
 bot = Bot(token=API_TOKEN)
-bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # Ссылка на видео с Google Drive
