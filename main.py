@@ -36,15 +36,17 @@ async def next_handler(callback: types.CallbackQuery):
 async def send_next(chat_id, user_id):
     item = get_next_content(user_id)
     keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Дальше ▶️", callback_data="next")]]
+        inline_keyboard=[[InlineKeyboardButton(text="Darf ich starten? 👇", callback_data="next")]]
     )
 
     if item is None:
-        await bot.send_message(chat_id, "📦 Конец контента.")
+        await bot.send_message(chat_id, "📦 Konversation abgeschlossen!")
     elif item["type"] == "text":
         await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
     elif item["type"] == "video":
         await bot.send_video(chat_id, item["data"], reply_markup=keyboard)
+    elif item["type"] == "button":
+        await bot.send_message(chat_id, item["data"], reply_markup=keyboard)
 
 async def main():
     await dp.start_polling(bot)
